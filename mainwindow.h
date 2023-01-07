@@ -16,7 +16,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked(bool checked);
+    void on_toolButton_clicked();
+
+    void on_horizontalSlider_valueChanged(int value);
+
+    void on_horizontalSlider_2_valueChanged(int value);
+
+    void on_horizontalSlider_3_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
