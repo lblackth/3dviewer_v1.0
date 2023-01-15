@@ -2,7 +2,7 @@
 
 void    ft_translate(double *vertexes, int v_amount, int axis, double d)
 {
-    for (int i = 0; i < v_amount * 3; i += 3)
+    for (int i = 0; i <= v_amount * 3; i += 3)
         vertexes[i + axis] += d;
 }
 

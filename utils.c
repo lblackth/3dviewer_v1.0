@@ -2,21 +2,18 @@
 
 void    info_init(t_info *info)
 {
-    info->minMax[0] = INFINITY;
-    info->minMax[1] = -INFINITY;
-    info->minMax[2] = INFINITY;
-    info->minMax[3] = -INFINITY;
-    info->minMax[4] = INFINITY;
-    info->minMax[5] = -INFINITY;
+    info->minMax[0] = DBL_MAX;
+    info->minMax[1] = -DBL_MAX;
+    info->minMax[2] = DBL_MAX;
+    info->minMax[3] = -DBL_MAX;
+    info->minMax[4] = DBL_MAX;
+    info->minMax[5] = -DBL_MAX;
     info->v_amount = 0;
     info->f_amount = 0;
 }
 
-t_info  *info_dup(t_info *info)
+void    info_dup(t_info *info, t_info *copy)
 {
-    t_info  *copy;
-
-    copy = (t_info *)malloc(sizeof(t_info));
     copy->f_amount = info->f_amount;
     copy->v_amount = info->v_amount;
     copy->minMax[0] = info->minMax[0];
@@ -31,7 +28,6 @@ t_info  *info_dup(t_info *info)
     copy->vertexes = (double *)malloc(copy->v_amount * 3 * sizeof(double));
     for (size_t i = 0; i < copy->v_amount * 3; i++)
         copy->vertexes[i] = info->vertexes[i];
-    return copy;
 }
 
 void    info_free(t_info *info)
@@ -39,6 +35,7 @@ void    info_free(t_info *info)
     free(info->facets);
     free(info->vertexes);
     free(info);
+    info = NULL;
 }
 
 void    ft_minMax(double x, double y, double z, t_info *info)

@@ -1,6 +1,6 @@
 #include "viewer.h"
 
-int parse(char *fileName, t_info *info)
+int parse(const char *fileName, t_info *info)
 {
     info_init(info);
     if (!vf_count(fileName, info))
@@ -10,7 +10,7 @@ int parse(char *fileName, t_info *info)
     return 1;
 }
 
-int vf_count(char *fileName, t_info *info)
+int vf_count(const char *fileName, t_info *info)
 {
     char    *str;
     size_t  n;
@@ -18,7 +18,7 @@ int vf_count(char *fileName, t_info *info)
     FILE *fr = fopen(fileName, "r");
     if (!fr)
         return 0;
-    while(getline(&str, &n, fr))
+    while(getline(&str, &n, fr) != EOF)
     {
         if (str[0] == 'v' && str[1] == ' ')
             info->v_amount++;
@@ -37,7 +37,6 @@ int vf_count(char *fileName, t_info *info)
                     i++;
             }
         }
-        free(str);
     }
     fclose(fr);
     info->vertexes = (double *)malloc(info->v_amount * 3 * sizeof(double));
@@ -45,11 +44,10 @@ int vf_count(char *fileName, t_info *info)
     return 1;
 }
 
-int vf_parse(char *fileName, t_info *info)
+int vf_parse(const char *fileName, t_info *info)
 {
     char    *str;
     size_t  n;
-    int     tmp_f, tmp_s, tmp_t;
     double  tmp_x, tmp_y, tmp_z;
 
     int v = 0;
@@ -57,7 +55,7 @@ int vf_parse(char *fileName, t_info *info)
     FILE *fr = fopen(fileName, "r");
     if (!fr)
         return 0;
-    while(getline(&str, &n, fr))
+    while(getline(&str, &n, fr) != EOF)
     {
         if (str[0] == 'v' && str[1] == ' ')
         {
@@ -70,16 +68,31 @@ int vf_parse(char *fileName, t_info *info)
         }
         else if (str[0] == 'f' && str[1] == ' ')
         {
-            sscanf(str, "f %d %d %d", &tmp_f, &tmp_s, &tmp_t);
-            info->facets[f + 0] = tmp_f;
-            info->facets[f + 1] = tmp_s;
-            info->facets[f + 2] = tmp_s;
-            info->facets[f + 3] = tmp_t;
-            info->facets[f + 4] = tmp_t;
-            info->facets[f + 5] = tmp_f;
-            f += 6;
+            char *token, *tmpstr, *tofree;
+            int tmpint;
+            int start = f;
+            tofree = tmpstr = strdup(str + 2);
+            while ((token = strsep(&tmpstr, " ")))
+            {
+                tmpint = atoi(token);
+                if (!tmpint)
+                    continue;
+                if (tmpint < 0)
+                    tmpint = info->v_amount - tmpint;
+                else
+                    tmpint--;
+                info->facets[f] = tmpint;
+                f++;
+                if (f != start + 1)
+                {
+                    info->facets[f] = tmpint;
+                    f++;
+                }
+            }
+            info->facets[f] = info->facets[start];
+            f++;
+            free(tofree);
         }
-        free(str);
     }
     fclose(fr);
     return 1;
